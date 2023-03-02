@@ -1,9 +1,11 @@
 import React from 'react';
 import {request, gql} from 'graphql-request';
-import uuid from 'uuid';
+import uuid from "uuid";
 
-export const getPosts = ()=>{
-    const query = gql`
+const graphqlAPI = process.env.HYGRAPH_PUBLIC_ENDPOINT || ''
+
+const getPosts = async ()=>{
+    const getDataQuery = gql`
         query ContentComponents {
             contentComponents {
             createdAt
@@ -17,4 +19,11 @@ export const getPosts = ()=>{
             }
         }      
     `
+    
+    const results = await request(graphqlAPI,getDataQuery)
+    .then(val=>{
+        return val.contentComponents
+    })    
+    return results;
 }
+export default getPosts;
