@@ -1,10 +1,8 @@
-import React from 'react';
 import {request, gql} from 'graphql-request';
-import uuid from "uuid";
 
 const graphqlAPI = process.env.HYGRAPH_PUBLIC_ENDPOINT || ''
 
-const getPosts = async ()=>{
+export const getPosts = async ()=>{
     const getDataQuery = gql`
         query ContentComponents {
             contentComponents {
@@ -12,10 +10,10 @@ const getPosts = async ()=>{
             datecreatedAt
             description
             heading
-            id
-            publishedAt
-            updatedAt
-            url
+            slug
+            categories {
+                name
+            }
             }
         }      
     `
@@ -26,4 +24,25 @@ const getPosts = async ()=>{
     })    
     return results;
 }
-export default getPosts;
+
+export const getPostsDetails = async (slug : String)=>{
+    const getPostContentDetails = gql`
+        query GetPostContentDetails($slug: String!) {
+            contentComponent(where: {slug: $slug}){
+                datecreatedAt
+                description
+                heading
+                slug
+                content {
+                    raw
+                }
+                categories {
+                    name
+                }
+          }
+        }
+    `
+    const result = request(graphqlAPI,getPostContentDetails, {slug})
+    .then(val=>val.contentComponent)
+    return result;
+}
